@@ -1,0 +1,31 @@
+{
+  "name": "youtube.ts",
+  "version": "1.0.0",
+  "description": "Wrapper for the YouTube API with typings.",
+  "main": "dist/youtube.js",
+  "types": "dist/youtube.d.ts",
+  "scripts": {
+    "start": "tsc && node dist/index.js",
+    "test": "ts-mocha --timeout 30000 -p tsconfig.json test/**/*.spec.ts",
+    "docs": "typedoc --out docs ./",
+    "prepublishOnly": "tsc"
+  },
+  "keywords": [
+    "youtube",
+    "typescript",
+    "ts",
+    "api",
+    "videos"
+  ],
+  "author": "Tenpi",
+  "license": "MIT",
+  "devDependencies": {
+    "@tenpi/tslint": "^1.0.5",
+    "@types/node": "^12.11.2",
+    "dotenv": "^8.2.0",
+    "typescript": "^3.6.4"
+  },
+  "dependencies": {
+    "axios": "^0.19.0"
+  }
+}
