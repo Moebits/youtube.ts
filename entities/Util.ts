@@ -75,9 +75,15 @@ export class Util {
     public iteratePages = async (searchResults: any, params: any, limit?: number) => {
         const resultArray = []
         const search = await this.api.get("search", params)
-        resultArray.push(search.items)
-        let rejected = false
+        for (let i = 0; i < search.items.length; i++) {
+            if (limit) {
+                if (limit === 0) return resultArray
+                limit--
+            }
+            resultArray.push(search.items[i])
+        }
         if (!limit) limit = Infinity
+        let rejected = false
         while (rejected === false && limit > 0) {
             params.pageToken = searchResults.nextPageToken
             try {
