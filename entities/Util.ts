@@ -1,7 +1,10 @@
 import axios from "axios"
 import * as fs from "fs"
 import * as querystring from "querystring"
+import * as stream from "stream"
+import ytdl from "ytdl-core"
 import api from "../API"
+import {YoutubeDownloadOptions, YoutubeVideo} from "../types"
 const downloadURL = "https://www.youtube.com/download_my_video"
 
 export class Util {
@@ -69,28 +72,26 @@ export class Util {
         fs.writeFileSync(dest, Buffer.from(response.data, "binary"))
     }
 
-    public iteratePages = async (searchResults: any, params: any) => {
+    public iteratePages = async (searchResults: any, params: any, limit?: number) => {
         const resultArray = []
         const search = await this.api.get("search", params)
         resultArray.push(search.items)
         let rejected = false
-        while (rejected === false) {
+        if (!limit) limit = Infinity
+        while (rejected === false && limit > 0) {
             params.pageToken = searchResults.nextPageToken
             try {
                 const newSearch = await this.api.get("search", params)
-                resultArray.push(newSearch.items)
+                for (let i = 0; i < newSearch.items.length; i++) {
+                    resultArray.push(newSearch.items[i])
+                    limit--
+                }
                 searchResults = newSearch
             } catch {
                 rejected = true
             }
         }
-        const newArray = []
-        for (let i = 0; i < resultArray.length; i++) {
-            for (let j = 0; j < resultArray[i].length; j++) {
-                newArray.push(resultArray[i][j])
-            }
-        }
-        return newArray
+        return resultArray
     }
 
     public downloadMyVideos = async (yourChannel: string, key: string, cookie: string, dest?: string) => {
@@ -106,5 +107,93 @@ export class Util {
                 }
             }
         }
+    }
+
+    public awaitStream = async (writeStream: stream.Writable) => {
+        return new Promise((resolve, reject) => {
+            writeStream.on("finish", resolve)
+            writeStream.on("error", reject)
+        })
+    }
+
+    public downloadVideo = async (videoResolvable: string,  dest?: string, ytdlOptions?: YoutubeDownloadOptions) => {
+        if (!ytdlOptions) ytdlOptions = {}
+        let options: any = {quality: "highest"}
+        if (ytdlOptions.format && !ytdlOptions.quality) {
+            options = {filter: (format) => format.container === ytdlOptions.format}
+        }
+        if (ytdlOptions.quality) {
+            options = {filter: (format) => {
+                if (!ytdlOptions.format) ytdlOptions.format = "mp4"
+                const resolution = ytdlOptions.quality.split("p")[0] + "p"
+                const fps = ytdlOptions.quality.split("p")[1] || "30"
+                if ((format.container === ytdlOptions.format) &&
+                    (format.resolution === resolution) &&
+                    (format.fps === fps)) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+            }
+        }
+        const id = await this.resolveID(videoResolvable, "video")
+        const url = `https://www.youtube.com/watch?v=${id}`
+        const info = await ytdl.getInfo(url)
+        if (!dest) dest = "./"
+        if (dest.endsWith("/")) dest = dest.slice(0, -1)
+        if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
+        const writeStream = fs.createWriteStream(`${dest}/${info.title}.mp4`)
+        ytdl(url, options).pipe(writeStream)
+        this.awaitStream(writeStream)
+    }
+
+    public downloadVideos = async (videos: YoutubeVideo[], dest?: string, ytdlOptions?: YoutubeDownloadOptions) => {
+        for (let i = 0; i < videos.length; i++) {
+            try {
+                this.downloadVideo(videos[i].id, dest, ytdlOptions)
+            } catch (error) {
+                continue
+            }
+        }
+        return
+    }
+
+    public downloadChannelVideos = async (channelResolvable: string, dest?: string, ytdlOptions?: YoutubeDownloadOptions) => {
+        const id = await this.resolveID(channelResolvable, "channel")
+        const search = await this.api.get("search", {channelId: id, order: "date"})
+        const videos = await this.iteratePages(search, {channelId: id, order: "date"})
+        for (let i = 0; i < videos.length; i++) {
+            if (videos[i].id.videoId) {
+                try {
+                    this.downloadVideo(videos[i].id.videoId, dest, ytdlOptions)
+                } catch (error) {
+                    continue
+                }
+            }
+        }
+    }
+
+    public downloadMP3 = async (videoResolvable: string, dest?: string) => {
+        const id = await this.resolveID(videoResolvable, "video")
+        const url = `https://www.youtube.com/watch?v=${id}`
+        const info = await ytdl.getInfo(url)
+        if (!dest) dest = "./"
+        if (dest.endsWith("/")) dest = dest.slice(0, -1)
+        if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
+        const writeStream = fs.createWriteStream(`${dest}/${info.title}.mp3`)
+        ytdl(url, {filter: "audioonly"}).pipe(writeStream)
+        this.awaitStream(writeStream)
+    }
+
+    public massDownloadMP3 = async (videos: YoutubeVideo[], dest?: string) => {
+        for (let i = 0; i < videos.length; i++) {
+            try {
+                this.downloadMP3(videos[i].id, dest)
+            } catch (error) {
+                continue
+            }
+        }
+        return
     }
 }

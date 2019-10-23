@@ -1,9 +1,11 @@
 {
     "cSpell.ignoreWords": [
+        "audioonly",
         "embeddable",
         "etag",
         "maxres",
         "seperate",
-        "youtube"
+        "youtube",
+        "ytdl"
     ]
 }
