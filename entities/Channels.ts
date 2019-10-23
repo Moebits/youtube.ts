@@ -1,5 +1,6 @@
 import api from "../API"
-import {YoutubeChannel, YoutubeChannelParams, YoutubeChannelSearch, YoutubeSearchParams} from "../types"
+import {YoutubeChannel, YoutubeChannelParams, YoutubeChannelSearch, YoutubeCommentParams, YoutubeCommentThreadSearch,
+YoutubeSearchParams, YoutubeSubscriptionParams, YoutubeSubscriptionSearch} from "../types"
 import {Util} from "./index"
 
 export class Channels {
@@ -19,5 +20,29 @@ export class Channels {
         params.type = "channel"
         const response = await this.api.part("search", "snippet", params)
         return response as Promise<YoutubeChannelSearch>
+    }
+
+    public allComments = async (channelResolvable: string, params?: YoutubeCommentParams) => {
+        const id = await this.util.resolveID(channelResolvable, "channel")
+        if (!params) params = {}
+        params.allThreadsRelatedToChannelId = id
+        const response = await this.api.get("commentThreads", params)
+        return response as Promise<YoutubeCommentThreadSearch>
+    }
+
+    public comments = async (channelResolvable: string, params?: YoutubeCommentParams) => {
+        const id = await this.util.resolveID(channelResolvable, "channel")
+        if (!params) params = {}
+        params.channelId = id
+        const response = await this.api.get("commentThreads", params)
+        return response as Promise<YoutubeCommentThreadSearch>
+    }
+
+    public subscriptions = async (channelResolvable: string, params?: YoutubeSubscriptionParams) => {
+        const id = await this.util.resolveID(channelResolvable, "channel")
+        if (!params) params = {}
+        params.channelId = id
+        const response = await this.api.get("subscriptions", params)
+        return response as Promise<YoutubeSubscriptionSearch>
     }
 }

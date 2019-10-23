@@ -1,5 +1,5 @@
 import api from "./API"
-import {Channels, Playlists, Util, Videos} from "./entities"
+import {Channels, Comments, Playlists, Util, Videos} from "./entities"
 
 export default class Youtube {
     public static apiKey: string
@@ -7,6 +7,7 @@ export default class Youtube {
     public channels = new Channels(this.api)
     public videos = new Videos(this.api)
     public playlists = new Playlists(this.api)
+    public comments = new Comments(this.api)
     public util = new Util(this.api)
     public constructor(apiKey: string) {
         Youtube.apiKey = apiKey
@@ -15,6 +16,7 @@ export default class Youtube {
         this.videos = new Videos(this.api)
         this.util = new Util(this.api)
         this.playlists = new Playlists(this.api)
+        this.comments = new Comments(this.api)
     }
 }
 

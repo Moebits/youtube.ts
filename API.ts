@@ -17,18 +17,32 @@ export default class API {
             case "video":
                 endpoint = "videos"
                 if (!params.part) params.part = "id, player, snippet, contentDetails, status, statistics"
+                break
             case "playlist":
                 endpoint = "playlists"
                 if (!params.part) params.part = "id, player, snippet, status, contentDetails"
+                break
             case "search":
                 endpoint = "search"
                 params.part = "snippet"
+                break
             case "comment":
                 endpoint = "comments"
                 params.part = "id, snippet"
+                break
+            case "commentThreads":
+                endpoint = "commentThreads"
+                params.part = "id, snippet, replies"
+                break
+            case "subscriptions":
+                endpoint = "subscriptions"
+                params.part = "id, snippet, contentDetails, subscriberSnippet"
+                break
             default:
         }
         endpoint = apiURL + endpoint
+        console.log(endpoint)
+        console.log(params)
         const response = await axios.get(endpoint, {params}).then((r) => r.data)
         if (!response.items[0]) return Promise.reject("Nothing was found.")
         return response
