@@ -1,5 +1,5 @@
 import api from "../API"
-import {YoutubePlaylistItem, YoutubePlaylistItemsSearch, YoutubePlaylistParams, YoutubePlaylistSearch, YoutubeSearchParams} from "../types"
+import {YoutubePlaylistItem, YoutubePlaylistItemsSearch, YoutubePlaylistParams, YoutubePlaylistSearch, YoutubeSearchParams} from "../types/index"
 import {Util} from "./index"
 
 export class Playlists {
@@ -18,7 +18,7 @@ export class Playlists {
         if (!params) params = {}
         const id = await this.util.resolveID(playlistResolvable, "playlist")
         params.playlistId = id
-        const response = await this.api.part("playlistItems", "id, snippet, status, contentDetails", params)
+        const response = await this.api.get("playlistItems", params)
         return response as Promise<YoutubePlaylistItemsSearch>
     }
 
@@ -27,7 +27,7 @@ export class Playlists {
         const playlistId = await this.util.resolveID(playlistResolvable, "playlist")
         const videoId = await this.util.resolveID(videoResolvable, "video")
         params.playlistId = playlistId
-        const response = await this.api.part("playlistItems", "id, snippet, status, contentDetails", params) as YoutubePlaylistItemsSearch
+        const response = await this.api.get("playlistItems", params) as YoutubePlaylistItemsSearch
         for (let i = 0; i < response.items.length; i++) {
             if (response.items[i].contentDetails.videoId === videoId) {
                 return response.items[i] as YoutubePlaylistItem
@@ -38,7 +38,7 @@ export class Playlists {
     public itemByID = async (playlistItemID: string, params?: YoutubePlaylistParams) => {
         if (!params) params = {}
         params.id = playlistItemID
-        const response = await this.api.part("playlistItems", "id, snippet, status, contentDetails", params)
+        const response = await this.api.get("playlistItems", params)
         if (!response.items[0]) return Promise.reject("Invalid playlist item id.")
         return response.items[0] as Promise<YoutubePlaylistItem>
     }

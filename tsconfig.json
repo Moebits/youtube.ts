@@ -1,7 +1,10 @@
 {
     "compilerOptions": {
         "outDir": "dist",
-        "declaration": true
+        "declaration": true,
+        "moduleResolution": "node",
+        "lib": ["es2020"],
+        "target": "es5"
     }, 
     "exclude": [
         "node_modules",

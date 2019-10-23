@@ -25,6 +25,7 @@ export default class API {
             case "search":
                 endpoint = "search"
                 params.part = "snippet"
+                if (!params.maxResults) params.maxResults = 50
                 break
             case "comment":
                 endpoint = "comments"
@@ -38,11 +39,13 @@ export default class API {
                 endpoint = "subscriptions"
                 params.part = "id, snippet, contentDetails, subscriberSnippet"
                 break
+            case "playlistItems":
+                endpoint = "playlistItems"
+                params.part = "id, snippet, status, contentDetails"
+                break
             default:
         }
         endpoint = apiURL + endpoint
-        console.log(endpoint)
-        console.log(params)
         const response = await axios.get(endpoint, {params}).then((r) => r.data)
         if (!response.items[0]) return Promise.reject("Nothing was found.")
         return response

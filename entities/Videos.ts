@@ -1,5 +1,5 @@
 import api from "../API"
-import {YoutubeCommentThreadSearch, YoutubeSearchParams, YoutubeVideo, YoutubeVideoParams, YoutubeVideoSearch} from "../types"
+import {YoutubeCommentThreadSearch, YoutubeSearchParams, YoutubeVideo, YoutubeVideoParams, YoutubeVideoSearch} from "../types/index"
 import {Util} from "./index"
 
 export class Videos {

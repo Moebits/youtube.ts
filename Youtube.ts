@@ -22,3 +22,4 @@ export default class Youtube {
 
 module.exports.default = Youtube
 export * from "./entities/index"
+export * from "./types/index"

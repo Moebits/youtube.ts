@@ -1,5 +1,5 @@
 import api from "../API"
-import {YoutubeSubscription, YoutubeSubscriptionParams} from "../types"
+import {YoutubeSubscription, YoutubeSubscriptionParams} from "../types/index"
 
 export class Subscriptions {
     public constructor(private readonly api: api) {}

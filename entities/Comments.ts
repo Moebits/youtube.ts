@@ -1,5 +1,5 @@
 import api from "../API"
-import {YoutubeComment, YoutubeCommentParams, YoutubeCommentThread} from "../types"
+import {YoutubeComment, YoutubeCommentParams, YoutubeCommentThread} from "../types/index"
 
 export class Comments {
     public constructor(private readonly api: api) {}

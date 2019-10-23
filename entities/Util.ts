@@ -2,12 +2,9 @@ import axios from "axios"
 import * as fs from "fs"
 import * as querystring from "querystring"
 import api from "../API"
-import {Channels, Playlists} from "./index"
 const downloadURL = "https://www.youtube.com/download_my_video"
 
 export class Util {
-    private readonly playlists = new Playlists(this.api)
-    private readonly channels = new Channels(this.api)
     constructor(private readonly api: api) {}
 
     public resolveID = async (resolvable: string, type: string) => {
@@ -63,6 +60,7 @@ export class Util {
             "cookie": cookie
         }
         const response = await axios.get(downloadURL, {responseType: "arraybuffer", params: {t: key, v: id}, headers})
+        if (!response.headers["content-disposition"]) return Promise.reject("Cannot download this video.")
         const filename = querystring.unescape(response.headers["content-disposition"].replace(`attachment; filename="`, "").slice(0, -1))
         if (!dest) dest = "./"
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
@@ -71,11 +69,42 @@ export class Util {
         fs.writeFileSync(dest, Buffer.from(response.data, "binary"))
     }
 
+    public iteratePages = async (searchResults: any, params: any) => {
+        const resultArray = []
+        const search = await this.api.get("search", params)
+        resultArray.push(search.items)
+        let rejected = false
+        while (rejected === false) {
+            params.pageToken = searchResults.nextPageToken
+            try {
+                const newSearch = await this.api.get("search", params)
+                resultArray.push(newSearch.items)
+                searchResults = newSearch
+            } catch {
+                rejected = true
+            }
+        }
+        const newArray = []
+        for (let i = 0; i < resultArray.length; i++) {
+            for (let j = 0; j < resultArray[i].length; j++) {
+                newArray.push(resultArray[i][j])
+            }
+        }
+        return newArray
+    }
+
     public downloadMyVideos = async (yourChannel: string, key: string, cookie: string, dest?: string) => {
         const id = await this.resolveID(yourChannel, "channel")
-        const channel = await this.channels.get(id)
-        const playlistID = channel.contentDetails.relatedPlaylists.uploads
-        // const items = await this.playlists.items(playlistID)
-        console.log(playlistID)
+        const search = await this.api.get("search", {channelId: id, order: "date"})
+        const videos = await this.iteratePages(search, {channelId: id, order: "date"})
+        for (let i = 0; i < videos.length; i++) {
+            if (videos[i].id.videoId) {
+                try {
+                    this.downloadMyVideo(videos[i].id.videoId, key, cookie, dest)
+                } catch (error) {
+                    continue
+                }
+            }
+        }
     }
 }

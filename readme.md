@@ -89,4 +89,110 @@ async function useAPI() {
 }
 ```
 
+#### Downloading Videos
+While downloading videos is not apart of the API, it's possible to download your own videos programmatically through youtube studio.
+You are going to need a **key** and your **browser cookie** in order for this to work. Not all videos are guaranteed to work, but I have managed to download the majority of my videos. 
+- Visit Youtube studio and go to any video page.
+- Open up dev tools (right click -> inspect) and open the network tab.
+- Download your video (hamburger menu -> download) and observe the network tab.
+- Look for an entry named `download_my_video?v=${video_id}&t={key}`
+- You want to grab the t parameter (this is your key). Also grab your browser cookie under `Request Headers`, this is required to authenticate the request. 
+```ts
+async function useAPI() {
+  const key = "your key"
+  const cookie = "your long browser cookie"
+  /*Download one video. The key changes somewhat frequently, make sure you update it if it fails.*/
+  await youtube.util.downloadMyVideo("https://www.youtube.com/watch?v=-BW7kUAPZiA", key, cookie, "./videos")
+
+  /*Download all of your videos programmatically. If there is an error, the video will be skipped.*/
+  await youtube.util.downloadMyVideos("https://www.youtube.com/channel/UC8qU4aFe81jzG1attsyQ5wQ", key, cookie, "./videos")
+}
+```
+
 #### Common Types
+
+<details>
+<summary>YoutubeChannel</summary>
+
+```ts
+export interface YoutubeChannel {
+    kind: string
+    etag: string
+    id: string
+    snippet: YoutubeChannelSnippet
+    contentDetails: YoutubeChannelContentDetails
+    statistics: YoutubeChannelStatistics
+    brandingSettings: YoutubeBrandingSettings
+}
+```
+</details>
+
+<details>
+<summary>YoutubeVideo</summary>
+
+```ts
+export interface YoutubeVideo {
+    kind: string
+    etag: string
+    id: string
+    snippet: YoutubeVideoSnippet
+    contentDetails: YoutubeVideoContentDetails
+    status: YoutubeVideoStatus
+    statistics: YoutubeVideoStatistics
+    player: {
+      embedHtml: string
+  }
+}
+```
+</details>
+
+<details>
+<summary>YoutubePlaylist</summary>
+
+```ts
+export interface YoutubePlaylist {
+    kind: string
+    etag: string
+    id: string
+    snippet: YoutubePlaylistSnippet
+    status: {
+      privacyStatus: string
+    },
+    contentDetails: {
+      itemCount: number
+    },
+    player: {
+      embedHtml: string
+  }
+}
+```
+</details>
+
+<details>
+<summary>YoutubeComment</summary>
+
+```ts
+export interface YoutubeComment {
+    kind: string
+    etag: string
+    id: string
+    snippet: {
+        authorDisplayName: string
+        authorProfileImageUrl: string
+        authorChannelUrl: string
+        authorChannelId: {
+            value: string
+        },
+        channelId?: string
+        videoId: string
+        textDisplay: string
+        textOriginal: string
+        canRate: boolean
+        viewerRating: string
+        likeCount: number
+        publishedAt: string
+        updatedAt: string
+    }
+}
+```
+</details>

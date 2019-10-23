@@ -1,6 +1,6 @@
 import api from "../API"
 import {YoutubeChannel, YoutubeChannelParams, YoutubeChannelSearch, YoutubeCommentParams, YoutubeCommentThreadSearch,
-YoutubeSearchParams, YoutubeSubscriptionParams, YoutubeSubscriptionSearch} from "../types"
+YoutubeSearchParams, YoutubeSubscriptionParams, YoutubeSubscriptionSearch} from "../types/index"
 import {Util} from "./index"
 
 export class Channels {
