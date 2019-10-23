@@ -89,23 +89,40 @@ async function useAPI() {
 }
 ```
 
-#### Downloading Videos
-While downloading videos is not apart of the API, it's possible to download your own videos programmatically through youtube studio.
-You are going to need a **key** and your **browser cookie** in order for this to work. Not all videos are guaranteed to work, but I have managed to download the majority of my videos. 
+#### Downloading Videos and Audio Tracks
+While downloading videos is not apart of the API, it's possible to download your own videos through youtube studio.
+You are going to need a **key** and your **browser cookie** in order for this to work. 
 - Visit Youtube studio and go to any video page.
 - Open up dev tools (right click -> inspect) and open the network tab.
 - Download your video (hamburger menu -> download) and observe the network tab.
 - Look for an entry named `download_my_video?v=${video_id}&t={key}`
 - You want to grab the t parameter (this is your key). Also grab your browser cookie under `Request Headers`, this is required to authenticate the request. 
+
+The other method, which works for any video, is to download it using [**ytdl-core**](https://www.npmjs.com/package/ytdl-core). Generally preferred as you can also specify a quality, format, and optionally download just the audio track.
 ```ts
 async function useAPI() {
   const key = "your key"
   const cookie = "your long browser cookie"
-  /*Download one video. The key changes somewhat frequently, make sure you update it if it fails.*/
+  /*Download one video through youtube studio. The key changes somewhat frequently, make sure you update it if it fails.*/
   await youtube.util.downloadMyVideo("https://www.youtube.com/watch?v=-BW7kUAPZiA", key, cookie, "./videos")
 
-  /*Download all of your videos programmatically. If there is an error, the video will be skipped.*/
-  await youtube.util.downloadMyVideos("https://www.youtube.com/channel/UC8qU4aFe81jzG1attsyQ5wQ", key, cookie, "./videos")
+  /*Download all of your videos from youtube studio. If there is an error, the video will be skipped. The final param is an optional limit.*/
+  await youtube.util.downloadMyVideos("https://www.youtube.com/channel/UC8qU4aFe81jzG1attsyQ5wQ", key, cookie, "./videos", 100)
+
+  /*Download any video on the website. You can specify the quality and format, the default is the highest available.*/
+  await youtube.util.downloadVideo("https://www.youtube.com/watch?v=mLJQ0HO5Alc", "./videos", {format: "mp4", quality: "720p60"})
+
+  /*Download just the MP3 track.*/
+  await youtube.util.downloadMP3("https://www.youtube.com/watch?v=mLJQ0HO5Alc", "./videos/mp3")
+
+  /*Mass download videos and/or mp3 files by passing in a YoutubeVideo[] array.*/
+  const videos = await youtube.videos.search({q: "cool vid"})
+  await youtube.util.downloadVideos(videos, "./videos")
+  await youtube.util.downloadMP3s(videos, "./videos/mp3")
+
+  /*There are also utilities for downloading all videos on a channel.*/
+  await youtube.util.downloadChannelVideos("tenpi", "./videos")
+  await youtube.util.downloadChannelMP3s("tenpi", "./videos/mp3")
 }
 ```
 

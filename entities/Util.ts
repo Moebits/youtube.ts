@@ -94,10 +94,10 @@ export class Util {
         return resultArray
     }
 
-    public downloadMyVideos = async (yourChannel: string, key: string, cookie: string, dest?: string) => {
+    public downloadMyVideos = async (yourChannel: string, key: string, cookie: string, dest?: string, limit?: number) => {
         const id = await this.resolveID(yourChannel, "channel")
         const search = await this.api.get("search", {channelId: id, order: "date"})
-        const videos = await this.iteratePages(search, {channelId: id, order: "date"})
+        const videos = await this.iteratePages(search, {channelId: id, order: "date"}, limit)
         for (let i = 0; i < videos.length; i++) {
             if (videos[i].id.videoId) {
                 try {
@@ -159,10 +159,10 @@ export class Util {
         return
     }
 
-    public downloadChannelVideos = async (channelResolvable: string, dest?: string, ytdlOptions?: YoutubeDownloadOptions) => {
+    public downloadChannelVideos = async (channelResolvable: string, dest?: string, ytdlOptions?: YoutubeDownloadOptions, limit?: number) => {
         const id = await this.resolveID(channelResolvable, "channel")
         const search = await this.api.get("search", {channelId: id, order: "date"})
-        const videos = await this.iteratePages(search, {channelId: id, order: "date"})
+        const videos = await this.iteratePages(search, {channelId: id, order: "date"}, limit)
         for (let i = 0; i < videos.length; i++) {
             if (videos[i].id.videoId) {
                 try {
@@ -186,7 +186,7 @@ export class Util {
         this.awaitStream(writeStream)
     }
 
-    public massDownloadMP3 = async (videos: YoutubeVideo[], dest?: string) => {
+    public downloadMP3s = async (videos: YoutubeVideo[], dest?: string) => {
         for (let i = 0; i < videos.length; i++) {
             try {
                 this.downloadMP3(videos[i].id, dest)
@@ -195,5 +195,20 @@ export class Util {
             }
         }
         return
+    }
+
+    public downloadChannelMP3s = async (channelResolvable: string, dest?: string, limit?: number) => {
+        const id = await this.resolveID(channelResolvable, "channel")
+        const search = await this.api.get("search", {channelId: id, order: "date"})
+        const videos = await this.iteratePages(search, {channelId: id, order: "date"}, limit)
+        for (let i = 0; i < videos.length; i++) {
+            if (videos[i].id.videoId) {
+                try {
+                    this.downloadMP3(videos[i].id.videoId, dest)
+                } catch (error) {
+                    continue
+                }
+            }
+        }
     }
 }
