@@ -211,4 +211,10 @@ export class Util {
             }
         }
     }
+
+    public streamMP3 = async (videoResolvable: string) => {
+        const id = await this.resolveID(videoResolvable, "video")
+        const url = `https://www.youtube.com/watch?v=${id}`
+        return ytdl(url, {filter: "audioonly"})
+    }
 }

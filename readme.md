@@ -123,6 +123,9 @@ async function useAPI() {
   /*There are also utilities for downloading all videos on a channel.*/
   await youtube.util.downloadChannelVideos("tenpi", "./videos")
   await youtube.util.downloadChannelMP3s("tenpi", "./videos/mp3")
+
+  /*This method will just return an MP3 stream. Useful for discord bots, for instance.*/
+  const readableStream = await youtube.util.streamMP3("https://www.youtube.com/watch?v=mLJQ0HO5Alc")
 }
 ```
 
