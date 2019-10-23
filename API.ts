@@ -43,6 +43,18 @@ export default class API {
                 endpoint = "playlistItems"
                 params.part = "id, snippet, status, contentDetails"
                 break
+            case "channelSections":
+                endpoint = "channelSections"
+                params.part = "id, snippet, contentDetails"
+                break
+            case "guideCategories":
+                endpoint = "guideCategories"
+                params.part = "snippet"
+                break
+            case "videoCategories":
+                endpoint = "videoCategories"
+                params.part = "snippet"
+                break
             default:
         }
         endpoint = apiURL + endpoint

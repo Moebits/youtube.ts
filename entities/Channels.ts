@@ -45,4 +45,19 @@ export class Channels {
         const response = await this.api.get("subscriptions", params)
         return response as Promise<YoutubeSubscriptionSearch>
     }
+
+    public sections = async (channelResolvable: string, params?: any) => {
+        const id = await this.util.resolveID(channelResolvable, "channel")
+        if (!params) params = {}
+        params.channelId = id
+        const response = await this.api.get("channelSections", params)
+        return response
+    }
+
+    public section = async (sectionID: string, params?: any) => {
+        if (!params) params = {}
+        params.id = sectionID
+        const response = await this.api.get("channelSections", params)
+        return response
+    }
 }
