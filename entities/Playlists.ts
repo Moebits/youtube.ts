@@ -1,5 +1,5 @@
 import api from "../API"
-import {YoutubePlaylistItem, YoutubePlaylistItemsSearch, YoutubePlaylistParams, YoutubePlaylistSearch, YoutubeSearchParams} from "../types/index"
+import {YoutubePlaylist, YoutubePlaylistItem, YoutubePlaylistItemsSearch, YoutubePlaylistParams, YoutubePlaylistSearch, YoutubeSearchParams} from "../types/index"
 import {Util} from "./index"
 
 export class Playlists {
@@ -11,7 +11,7 @@ export class Playlists {
         const id = await this.util.resolveID(playlistResolvable, "playlist")
         params.id = id
         const response = await this.api.get("playlist", params)
-        return response.items[0]
+        return response.items[0] as Promise<YoutubePlaylist>
     }
 
     public items = async (playlistResolvable: string, params?: YoutubePlaylistParams) => {

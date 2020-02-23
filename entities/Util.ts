@@ -70,6 +70,7 @@ export class Util {
         if (dest.endsWith("/")) dest = dest.slice(0, -1)
         dest = `${dest}/${filename}`
         fs.writeFileSync(dest, Buffer.from(response.data, "binary"))
+        return dest
     }
 
     public iteratePages = async (searchResults: any, params: any, limit?: number) => {

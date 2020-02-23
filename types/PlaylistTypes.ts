@@ -29,6 +29,7 @@ export interface YoutubePlaylistSnippet {
          maxres: YoutubeThumbnail
         },
     channelTitle: string
+    tags: string[]
     localized: {
          title: string
          description: string
