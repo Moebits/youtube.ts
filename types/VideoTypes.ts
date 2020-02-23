@@ -45,8 +45,8 @@ export interface YoutubeVideoSnippet {
         default: YoutubeThumbnail
         medium: YoutubeThumbnail
         high: YoutubeThumbnail
-        standard: YoutubeThumbnail
-        maxres: YoutubeThumbnail
+        standard?: YoutubeThumbnail
+        maxres?: YoutubeThumbnail
     },
     channelTitle: string
     tags: string[]

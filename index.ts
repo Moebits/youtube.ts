@@ -14,7 +14,9 @@ const youtube = new Youtube(process.env.GOOGLE_API_KEY);
     const key = "lJGPgo6rkJXi8_l2BUDvkNOJM2V8MTU3MTg5MzMwM0AxNTcxODA2OTAz"
     // await youtube.util.downloadMyVideo("mLJQ0HO5Alc", key, cookie, "./videos")
     // await youtube.util.downloadMyVideos("tenpi", key, cookie, "./videos/tenpi")
-    await youtube.util.downloadMP3("mLJQ0HO5Alc", "./videos/ytdl/bad")
+    // await youtube.util.downloadMP3("mLJQ0HO5Alc", "./videos/ytdl/bad")
     // await youtube.util.downloadChannelVideos("UC8qU4aFe81jzG1attsyQ5wQ", "./videos/tenpi")
     // console.log(result.items[0])
+    const c = await youtube.videos.comments("https://www.youtube.com/watch?v=cZDsFjEmlDg")
+    console.log(c)
 })()
