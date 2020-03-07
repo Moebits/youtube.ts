@@ -105,15 +105,18 @@ export class Util {
         const id = await this.resolveID(yourChannel, "channel")
         const search = await this.api.get("search", {channelId: id, order: "date"})
         const videos = await this.iteratePages(search, {channelId: id, order: "date"}, limit)
+        const links: string[] = []
         for (let i = 0; i < videos.length; i++) {
             if (videos[i].id.videoId) {
                 try {
-                    this.downloadMyVideo(videos[i].id.videoId, key, cookie, dest)
+                    const link = await this.downloadMyVideo(videos[i].id.videoId, key, cookie, dest)
+                    links.push(link)
                 } catch (error) {
                     continue
                 }
             }
         }
+        return links
     }
 
     public awaitStream = async (writeStream: stream.Writable) => {
@@ -153,32 +156,38 @@ export class Util {
         const writeStream = fs.createWriteStream(`${dest}/${info.title}.mp4`)
         ytdl(url, options).pipe(writeStream)
         this.awaitStream(writeStream)
+        return `${dest}/${info.title}.mp4`
     }
 
     public downloadVideos = async (videos: YoutubeVideo[], dest?: string, ytdlOptions?: YoutubeDownloadOptions) => {
+        const links: string[] = []
         for (let i = 0; i < videos.length; i++) {
             try {
-                this.downloadVideo(videos[i].id, dest, ytdlOptions)
+                const link = await this.downloadVideo(videos[i].id, dest, ytdlOptions)
+                links.push(link)
             } catch (error) {
                 continue
             }
         }
-        return
+        return links
     }
 
     public downloadChannelVideos = async (channelResolvable: string, dest?: string, ytdlOptions?: YoutubeDownloadOptions, limit?: number) => {
         const id = await this.resolveID(channelResolvable, "channel")
         const search = await this.api.get("search", {channelId: id, order: "date"})
         const videos = await this.iteratePages(search, {channelId: id, order: "date"}, limit)
+        const links: string[] = []
         for (let i = 0; i < videos.length; i++) {
             if (videos[i].id.videoId) {
                 try {
-                    this.downloadVideo(videos[i].id.videoId, dest, ytdlOptions)
+                    const link = await this.downloadVideo(videos[i].id.videoId, dest, ytdlOptions)
+                    links.push(link)
                 } catch (error) {
                     continue
                 }
             }
         }
+        return links
     }
 
     public downloadMP3 = async (videoResolvable: string, dest?: string) => {
@@ -191,32 +200,38 @@ export class Util {
         const writeStream = fs.createWriteStream(`${dest}/${info.title}.mp3`)
         ytdl(url, {filter: "audioonly"}).pipe(writeStream)
         this.awaitStream(writeStream)
+        return `${dest}/${info.title}.mp3`
     }
 
     public downloadMP3s = async (videos: YoutubeVideo[], dest?: string) => {
+        const links: string[] = []
         for (let i = 0; i < videos.length; i++) {
             try {
-                this.downloadMP3(videos[i].id, dest)
+                const link = await this.downloadMP3(videos[i].id, dest)
+                links.push(link)
             } catch (error) {
                 continue
             }
         }
-        return
+        return links
     }
 
     public downloadChannelMP3s = async (channelResolvable: string, dest?: string, limit?: number) => {
         const id = await this.resolveID(channelResolvable, "channel")
         const search = await this.api.get("search", {channelId: id, order: "date"})
         const videos = await this.iteratePages(search, {channelId: id, order: "date"}, limit)
+        const links: string[] = []
         for (let i = 0; i < videos.length; i++) {
             if (videos[i].id.videoId) {
                 try {
-                    this.downloadMP3(videos[i].id.videoId, dest)
+                    const link = await this.downloadMP3(videos[i].id.videoId, dest)
+                    links.push(link)
                 } catch (error) {
                     continue
                 }
             }
         }
+        return links
     }
 
     public streamMP3 = async (videoResolvable: string) => {
