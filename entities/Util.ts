@@ -4,7 +4,7 @@ import * as querystring from "querystring"
 import * as stream from "stream"
 import ytdl from "ytdl-core"
 import api from "../API"
-import {YoutubeDownloadOptions, YoutubeVideo} from "../types"
+import {YoutubeDownloadOptions, YoutubeVideo, YoutubeVideoSearchItem} from "../types"
 const downloadURL = "https://www.youtube.com/download_my_video"
 
 export class Util {
@@ -159,11 +159,13 @@ export class Util {
         return `${dest}/${info.title}.mp4`
     }
 
-    public downloadVideos = async (videos: YoutubeVideo[], dest?: string, ytdlOptions?: YoutubeDownloadOptions) => {
+    public downloadVideos = async (videos: string[] | YoutubeVideo[], dest?: string, ytdlOptions?: YoutubeDownloadOptions) => {
         const links: string[] = []
         for (let i = 0; i < videos.length; i++) {
             try {
-                const link = await this.downloadVideo(videos[i].id, dest, ytdlOptions)
+                let id = videos[i] as string
+                if (id.hasOwnProperty("id")) id = (videos[i] as YoutubeVideo).id
+                const link = await this.downloadVideo(id, dest, ytdlOptions)
                 links.push(link)
             } catch (error) {
                 continue
@@ -203,11 +205,13 @@ export class Util {
         return `${dest}/${info.title}.mp3`
     }
 
-    public downloadMP3s = async (videos: YoutubeVideo[], dest?: string) => {
+    public downloadMP3s = async (videos: string[] | YoutubeVideo[], dest?: string) => {
         const links: string[] = []
         for (let i = 0; i < videos.length; i++) {
             try {
-                const link = await this.downloadMP3(videos[i].id, dest)
+                let id = videos[i] as string
+                if (id.hasOwnProperty("id")) id = (videos[i] as YoutubeVideo).id
+                const link = await this.downloadMP3(id, dest)
                 links.push(link)
             } catch (error) {
                 continue
