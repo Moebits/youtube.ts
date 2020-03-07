@@ -150,13 +150,14 @@ export class Util {
         const id = await this.resolveID(videoResolvable, "video")
         const url = `https://www.youtube.com/watch?v=${id}`
         const info = await ytdl.getInfo(url)
+        const clean = info.title.replace(/\//g, " ").replace(/\\/g, " ")
         if (!dest) dest = "./"
         if (dest.endsWith("/")) dest = dest.slice(0, -1)
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
-        const writeStream = fs.createWriteStream(`${dest}/${info.title}.mp4`)
+        const writeStream = fs.createWriteStream(`${dest}/${clean}.mp4`)
         ytdl(url, options).pipe(writeStream)
         this.awaitStream(writeStream)
-        return `${dest}/${info.title}.mp4`
+        return `${dest}/${clean}.mp4`
     }
 
     public downloadVideos = async (videos: string[] | YoutubeVideo[], dest?: string, ytdlOptions?: YoutubeDownloadOptions) => {
@@ -196,13 +197,14 @@ export class Util {
         const id = await this.resolveID(videoResolvable, "video")
         const url = `https://www.youtube.com/watch?v=${id}`
         const info = await ytdl.getInfo(url)
+        const clean = info.title.replace(/\//g, " ").replace(/\\/g, " ")
         if (!dest) dest = "./"
         if (dest.endsWith("/")) dest = dest.slice(0, -1)
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
-        const writeStream = fs.createWriteStream(`${dest}/${info.title}.mp3`)
+        const writeStream = fs.createWriteStream(`${dest}/${clean}.mp3`)
         ytdl(url, {filter: "audioonly"}).pipe(writeStream)
         this.awaitStream(writeStream)
-        return `${dest}/${info.title}.mp3`
+        return `${dest}/${clean}.mp3`
     }
 
     public downloadMP3s = async (videos: string[] | YoutubeVideo[], dest?: string) => {
