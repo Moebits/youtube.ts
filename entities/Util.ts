@@ -203,7 +203,7 @@ export class Util {
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
         const writeStream = fs.createWriteStream(`${dest}/${clean}.mp3`)
         ytdl(url, {filter: "audioonly"}).pipe(writeStream)
-        this.awaitStream(writeStream)
+        await this.awaitStream(writeStream)
         return `${dest}/${clean}.mp3`
     }
 
