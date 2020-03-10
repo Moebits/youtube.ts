@@ -155,7 +155,7 @@ export class Util {
         if (dest.endsWith("/")) dest = dest.slice(0, -1)
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
         const writeStream = fs.createWriteStream(`${dest}/${clean}.mp4`)
-        ytdl(url, options).pipe(writeStream)
+        await ytdl(url, options).then((r) => r.pipe(writeStream))
         this.awaitStream(writeStream)
         return `${dest}/${clean}.mp4`
     }
@@ -202,7 +202,7 @@ export class Util {
         if (dest.endsWith("/")) dest = dest.slice(0, -1)
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
         const writeStream = fs.createWriteStream(`${dest}/${clean}.mp3`)
-        ytdl(url, {filter: "audioonly"}).pipe(writeStream)
+        await ytdl(url, {filter: "audioonly"}).then((r) => r.pipe(writeStream))
         await this.awaitStream(writeStream)
         return `${dest}/${clean}.mp3`
     }
