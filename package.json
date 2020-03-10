@@ -1,6 +1,6 @@
 {
   "name": "youtube.ts",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Wrapper for the YouTube API with typings.",
   "main": "dist/youtube.js",
   "types": "dist/youtube.d.ts",
@@ -35,6 +35,6 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
-    "ytdl-core": "^1.0.0"
+    "ytdl-core-discord": "^1.1.0"
   }
 }
