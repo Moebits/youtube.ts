@@ -1,6 +1,9 @@
 import api from "./API"
 import {Channels, Comments, Info, Playlists, Util, Videos} from "./entities"
 
+/**
+ * The main class for interacting with the youtube api.
+ */
 export default class Youtube {
     public static apiKey: string
     public api = new api(Youtube.apiKey)
