@@ -4,7 +4,7 @@
         "declaration": true,
         "moduleResolution": "node",
         "lib": ["es2020"],
-        "target": "es5",
+        "downlevelIteration": true,
         "esModuleInterop": true
     }, 
     "exclude": [
