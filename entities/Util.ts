@@ -2,7 +2,7 @@ import axios from "axios"
 import * as fs from "fs"
 import * as querystring from "querystring"
 import * as stream from "stream"
-import ytdl from "ytdl-core-discord"
+import ytdl from "ytdl-core"
 import api from "../API"
 import {YoutubeDownloadOptions, YoutubeVideo, YoutubeVideoSearchItem} from "../types"
 const downloadURL = "https://www.youtube.com/download_my_video"
@@ -155,7 +155,7 @@ export class Util {
         if (dest.endsWith("/")) dest = dest.slice(0, -1)
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
         const writeStream = fs.createWriteStream(`${dest}/${clean}.mp4`)
-        await ytdl(url, options).then((r) => r.pipe(writeStream))
+        ytdl(url, options).pipe(writeStream)
         this.awaitStream(writeStream)
         return `${dest}/${clean}.mp4`
     }
@@ -202,7 +202,7 @@ export class Util {
         if (dest.endsWith("/")) dest = dest.slice(0, -1)
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
         const writeStream = fs.createWriteStream(`${dest}/${clean}.mp3`)
-        await ytdl(url, {filter: "audioonly"}).then((r) => r.pipe(writeStream))
+        ytdl(url, {filter: "audioonly"}).pipe(writeStream)
         await this.awaitStream(writeStream)
         return `${dest}/${clean}.mp3`
     }
