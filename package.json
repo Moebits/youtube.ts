@@ -1,6 +1,6 @@
 {
   "name": "youtube.ts",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Wrapper for the YouTube API with typings.",
   "main": "dist/youtube.js",
   "types": "dist/youtube.d.ts",
