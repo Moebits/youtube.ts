@@ -11,7 +11,7 @@ export class Util {
     constructor(private readonly api: api) {}
 
     public resolveID = async (resolvable: string, type: string) => {
-        resolvable = resolvable?.trim()
+        resolvable = resolvable.trim()
         let id: string
         if (resolvable.includes("youtube.com") || resolvable.includes("youtu.be")) {
             if (resolvable.includes("channel")) {
@@ -150,7 +150,7 @@ export class Util {
         const id = await this.resolveID(videoResolvable, "video")
         const url = `https://www.youtube.com/watch?v=${id}`
         const info = await ytdl.getInfo(url)
-        const clean = info.title.replace(/\//g, " ").replace(/\\/g, " ")
+        const clean = info.videoDetails.title.replace(/\//g, " ").replace(/\\/g, " ")
         if (!dest) dest = "./"
         if (dest.endsWith("/")) dest = dest.slice(0, -1)
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
@@ -198,7 +198,7 @@ export class Util {
         const id = await this.resolveID(videoResolvable, "video")
         const url = `https://www.youtube.com/watch?v=${id}`
         const info = await ytdl.getInfo(url)
-        const clean = info.title.replace(/\//g, " ").replace(/\\/g, " ")
+        const clean = info.videoDetails.title.replace(/\//g, " ").replace(/\\/g, " ")
         if (!dest) dest = "./"
         if (dest.endsWith("/")) dest = dest.slice(0, -1)
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
