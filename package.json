@@ -1,8 +1,9 @@
 {
   "name": "youtube.ts",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "description": "Wrapper for the YouTube API with typings.",
   "main": "dist/youtube.js",
+  "module": "dist/youtube.js",
   "types": "dist/youtube.d.ts",
   "scripts": {
     "start": "tsc && node dist/start.js",
@@ -35,6 +36,6 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
-    "ytdl-core": "^2.0.0"
+    "ytdl-core": "^3.2.2"
   }
 }

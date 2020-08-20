@@ -11,7 +11,7 @@ export class Util {
     constructor(private readonly api: api) {}
 
     public resolveID = async (resolvable: string, type: string) => {
-        resolvable = resolvable.trim()
+        resolvable = resolvable?.trim()
         let id: string
         if (resolvable.includes("youtube.com") || resolvable.includes("youtu.be")) {
             if (resolvable.includes("channel")) {
