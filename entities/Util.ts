@@ -1,10 +1,11 @@
 import axios from "axios"
-import * as fs from "fs"
-import * as querystring from "querystring"
-import * as stream from "stream"
+import fs from "fs"
+import path from "path"
+import querystring from "querystring"
+import stream from "stream"
 import ytdl from "ytdl-core"
 import api from "../API"
-import {YoutubeDownloadOptions, YoutubeVideo, YoutubeVideoSearchItem} from "../types"
+import {YoutubeDownloadOptions, YoutubeVideo, YoutubeVideoParams} from "../types"
 const downloadURL = "https://www.youtube.com/download_my_video"
 
 export class Util {
@@ -246,5 +247,27 @@ export class Util {
         const id = await this.resolveID(videoResolvable, "video")
         const url = `https://www.youtube.com/watch?v=${id}`
         return ytdl(url, {filter: "audioonly"})
+    }
+
+    /**
+     * Downloads the thumbnail of a youtube video.
+     */
+    public downloadThumbnail = async (videoResolvable: string, folder?: string) => {
+        if (!folder) folder = "./"
+        if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
+        const video = await this.getVideo(videoResolvable)
+        const thumbnail = video.snippet.thumbnails.maxres ? video.snippet.thumbnails.maxres.url : video.snippet.thumbnails.high.url
+        const dest = path.join(folder, `${video.snippet.title}.png`)
+        const arrayBuffer = await axios.get(thumbnail, {responseType: "arraybuffer"}).then((r) => r.data)
+        fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
+        return dest
+    }
+
+    private readonly getVideo = async (videoResolvable: string, params?: YoutubeVideoParams) => {
+        if (!params) params = {}
+        const id = await this.resolveID(videoResolvable, "video")
+        params.id = id
+        const response = await this.api.get("video", params)
+        return response.items[0] as Promise<YoutubeVideo>
     }
 }
