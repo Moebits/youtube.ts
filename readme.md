@@ -1,6 +1,6 @@
 <div align="left">
   <p>
-    <a href="https://tenpi.github.io/youtube.ts/"><img src="https://raw.githubusercontent.com/Tenpi/youtube.ts/master/images/youtube.tslogo.gif" width="500" /></a>
+    <a href="https://tenpi.github.io/youtube.ts/"><img src="https://raw.githubusercontent.com/Tenpi/youtube.ts/master/images/youtube.tslogo.png" width="500" /></a>
   </p>
   <p>
     <a href="https://nodei.co/npm/youtube.ts/"><img src="https://nodei.co/npm/youtube.ts.png" /></a>
