@@ -54,6 +54,7 @@ export interface YoutubePlaylistItemsSearch {
         resultsPerPage: number
     },
     items: YoutubePlaylistItem[]
+    nextPageToken: string
 }
 
 export interface YoutubePlaylistItem {
