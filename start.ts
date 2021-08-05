@@ -1,7 +1,7 @@
 import Youtube from "./youtube"
 
 require("dotenv").config()
-const youtube = new Youtube(process.env.GOOGLE_API_KEY);
+const youtube = new Youtube();
 
 (async () => {
     // const result = await youtube.playlists.items("https://www.youtube.com/playlist?list=PL1BC175_2xP8ifSS9CM92G5eIOPRG1g7t")
@@ -15,6 +15,8 @@ const youtube = new Youtube(process.env.GOOGLE_API_KEY);
     // await youtube.util.downloadMP3("https://www.youtube.com/watch?v=LysVlPg2fd8", "./videos/ytdl/bad")
     // await youtube.util.downloadChannelVideos("UC8qU4aFe81jzG1attsyQ5wQ", "./videos/tenpi")
     // console.log(result.items[0])
+    const d = await youtube.util.downloadMP3("https://www.youtube.com/watch?v=OJf04b6884E", "./videos")
+    console.log(d)
     const c = await youtube.util.downloadThumbnail("https://www.youtube.com/watch?v=OJf04b6884E", "./videos")
     console.log(c)
 })()

@@ -156,7 +156,7 @@ export class Util {
         if (dest.endsWith("/")) dest = dest.slice(0, -1)
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
         const writeStream = fs.createWriteStream(`${dest}/${clean}.mp4`)
-        await new Promise((resolve) => {
+        await new Promise<void>((resolve) => {
             ytdl(url, options).pipe(writeStream).on("finish", () => resolve())
         })
         return `${dest}/${clean}.mp4`
@@ -204,7 +204,7 @@ export class Util {
         if (dest.endsWith("/")) dest = dest.slice(0, -1)
         if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
         const writeStream = fs.createWriteStream(`${dest}/${clean}.mp3`)
-        await new Promise((resolve) => {
+        await new Promise<void>((resolve) => {
             ytdl(url, {filter: "audioonly"}).pipe(writeStream).on("finish", () => resolve())
         })
         return `${dest}/${clean}.mp3`
@@ -252,22 +252,17 @@ export class Util {
     /**
      * Downloads the thumbnail of a youtube video.
      */
-    public downloadThumbnail = async (videoResolvable: string, folder?: string) => {
+    public downloadThumbnail = async (videoResolvable: string, folder?: string, noDL?: boolean) => {
         if (!folder) folder = "./"
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
-        const video = await this.getVideo(videoResolvable)
-        const thumbnail = video.snippet.thumbnails.maxres ? video.snippet.thumbnails.maxres.url : video.snippet.thumbnails.high.url
-        const dest = path.join(folder, `${video.snippet.title}.png`)
+        const id = await this.resolveID(videoResolvable, "video")
+        const url = `https://www.youtube.com/watch?v=${id}`
+        const info = await ytdl.getInfo(url)
+        const thumbnail = info.videoDetails.thumbnails[info.videoDetails.thumbnails.length - 1].url
+        if (noDL) return thumbnail
+        const dest = path.join(folder, `${info.videoDetails.title}.png`)
         const arrayBuffer = await axios.get(thumbnail, {responseType: "arraybuffer"}).then((r) => r.data)
         fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
         return dest
-    }
-
-    private readonly getVideo = async (videoResolvable: string, params?: YoutubeVideoParams) => {
-        if (!params) params = {}
-        const id = await this.resolveID(videoResolvable, "video")
-        params.id = id
-        const response = await this.api.get("video", params)
-        return response.items[0] as Promise<YoutubeVideo>
     }
 }
