@@ -265,4 +265,14 @@ export class Util {
         fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
         return dest
     }
+
+    /**
+     * Gets a video's title from the url.
+     */
+    public getTitle = async (videoResolvable: string) => {
+        const id = await this.resolveID(videoResolvable, "video")
+        const url = `https://www.youtube.com/watch?v=${id}`
+        const info = await ytdl.getInfo(url)
+        return info.videoDetails.title
+    }
 }
