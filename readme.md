@@ -143,6 +143,7 @@ export interface YoutubeChannel {
     contentDetails: YoutubeChannelContentDetails
     statistics: YoutubeChannelStatistics
     brandingSettings: YoutubeBrandingSettings
+    country: string
 }
 ```
 </details>
