@@ -24,8 +24,8 @@ export interface YoutubeChannelSnippet {
     localized: {
          title: string
          description: string
-         country: string
     }
+    country: string
 }
 
 export interface YoutubeChannelContentDetails {
