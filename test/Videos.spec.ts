@@ -4,7 +4,7 @@ import {youtube} from "./login"
 
 describe("Videos", async function() {
     it("should get a video", async function() {
-        const response = await youtube.videos.get("https://www.youtube.com/watch?v=LT0gIN9agrM")
+        const response = await youtube.videos.get("https://www.youtube.com/watch?v=ufXPPpeFJ6E")
         assert(response.hasOwnProperty("contentDetails"))
     })
 
@@ -14,7 +14,7 @@ describe("Videos", async function() {
     })
 
     it("should get all comments on a video", async function() {
-        const response = await youtube.videos.comments("https://www.youtube.com/watch?v=-BW7kUAPZiA&t=47s")
+        const response = await youtube.videos.comments("https://www.youtube.com/watch?v=ufXPPpeFJ6E")
         assert(response.hasOwnProperty("items"))
     })
 })
