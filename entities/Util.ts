@@ -45,6 +45,8 @@ export class Util {
             }
         }
 
+        console.log({resolvable, id, type});
+
         if (!id) return Promise.reject("Invalid URL or query.")
         return id
     }
