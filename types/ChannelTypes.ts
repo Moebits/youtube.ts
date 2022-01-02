@@ -38,7 +38,6 @@ export interface YoutubeChannelContentDetails {
 
 export interface YoutubeChannelStatistics {
     viewCount: string
-    commentCount: string
     subscriberCount: string
     hiddenSubscriberCount: boolean
     videoCount: string
@@ -61,27 +60,10 @@ export interface YoutubeBrandingSettings {
         country: string
         },
     image: YoutubeBanner
-    hints: Array<{
-        property: string
-        value: string
-    }>
 }
 
 export interface YoutubeBanner {
-    bannerImageUrl: string
-    bannerMobileImageUrl: string
-    bannerTabletLowImageUrl: string
-    bannerTabletImageUrl: string
-    bannerTabletHdImageUrl: string
-    bannerTabletExtraHdImageUrl: string
-    bannerMobileLowImageUrl: string
-    bannerMobileMediumHdImageUrl: string
-    bannerMobileHdImageUrl: string
-    bannerMobileExtraHdImageUrl: string
-    bannerTvImageUrl: string
-    bannerTvLowImageUrl: string
-    bannerTvMediumImageUrl: string
-    bannerTvHighImageUrl: string
+    bannerExternalUrl: string
 }
 
 export interface YoutubeChannelParams {
