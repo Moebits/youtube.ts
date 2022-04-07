@@ -10,7 +10,7 @@ export default class Youtube {
     public comments = new Comments(this.api)
     public util = new Util(this.api)
     public info = new Info(this.api)
-    public constructor(apiKey: string) {
+    public constructor(apiKey?: string) {
         Youtube.apiKey = apiKey
         this.api = new api(Youtube.apiKey)
         this.channels = new Channels(this.api)
