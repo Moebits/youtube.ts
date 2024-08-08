@@ -1,6 +1,6 @@
 <div align="left">
   <p>
-    <a href="https://tenpi.github.io/youtube.ts/"><img src="https://raw.githubusercontent.com/Tenpi/youtube.ts/master/images/youtube.tslogo.png" width="500" /></a>
+    <a href="https://moebits.github.io/youtube.ts/"><img src="https://raw.githubusercontent.com/Moebits/youtube.ts/master/images/youtube.tslogo.png" width="500" /></a>
   </p>
   <p>
     <a href="https://nodei.co/npm/youtube.ts/"><img src="https://nodei.co/npm/youtube.ts.png" /></a>
@@ -29,16 +29,16 @@ async function useAPI() {
   /*You can find channels by URL or search query. youtube.com/username, /c/username and /user/username links also work.
   The http and www parts can be omitted.*/
   const channel = await youtube.channels.get("https://www.youtube.com/channel/UC8qU4aFe81jzG1attsyQ5wQ")
-  const channelByCustomURL = await youtube.channels.get("https://www.youtube.com/c/tenpi")
-  const channelByQuery = await youtube.channels.get("tenpi")
+  const channelByCustomURL = await youtube.channels.get("https://www.youtube.com/c/mychannel")
+  const channelByQuery = await youtube.channels.get("mychannel")
   
 
   /*Searching is simple, but beware as it uses 100 quota. Important parameters are q (query) and maxResults.*/
   const channelSearch = await youtube.channels.search({q: "cool channels", maxResults: 10})
 
   /*You can get the comments in the discussion tab, or all comments in all videos on the channel.*/
-  const discussionComments = await youtube.channels.comments("tenpi")
-  const allComments = await youtube.channels.allComments("tenpi")
+  const discussionComments = await youtube.channels.comments("mychannel")
+  const allComments = await youtube.channels.allComments("mychannel")
 
   /*If the channel has their subscriptions set to public, you can also retrieve them all.*/
   const subscriptions = await youtube.channel.subscriptions("some channel")
