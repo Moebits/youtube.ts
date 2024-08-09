@@ -4,7 +4,7 @@ import {youtube} from "./login"
 
 describe("Channels", async function() {
     it("should get a channel", async function() {
-        const response = await youtube.channels.get("tenpi")
+        const response = await youtube.channels.get("pewdiepie")
         assert(response.hasOwnProperty("brandingSettings"))
     })
 
@@ -14,7 +14,7 @@ describe("Channels", async function() {
     })
 
     it("should search for all comments", async function() {
-        const response = await youtube.channels.allComments("tenpi")
+        const response = await youtube.channels.allComments("pewdiepie")
         assert(response.hasOwnProperty("items"))
     })
 

@@ -9,7 +9,7 @@ describe("Videos", async function() {
     })
 
     it("should search for videos", async function() {
-        const response = await youtube.videos.search({q: "tenpi geometry dash osu"})
+        const response = await youtube.videos.search({q: "osu"})
         assert(response.hasOwnProperty("items"))
     })
 
