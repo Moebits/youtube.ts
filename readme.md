@@ -98,7 +98,7 @@ You are going to need a **key** and your **browser cookie** in order for this to
 - Look for an entry named `download_my_video?v=${video_id}&t={key}`
 - You want to grab the t parameter (this is your key). Also grab your browser cookie under `Request Headers`, this is required to authenticate the request. 
 
-The other method, which works for any video, is to download it using [**ytdl-core**](https://www.npmjs.com/package/ytdl-core). Generally preferred as you can also specify a quality, format, and optionally download just the audio track.
+The other method, which works for any video, is to download it using [**yt-dlp**](https://github.com/yt-dlp/yt-dlp). You will have to install this separately and make it available from invoking yt-dlp in the terminal. 
 ```ts
 async function useAPI() {
   const key = "your key"
@@ -109,10 +109,10 @@ async function useAPI() {
   /*Download all of your videos from youtube studio. If there is an error, the video will be skipped. The final param is an optional limit.*/
   await youtube.util.downloadMyVideos("https://www.youtube.com/channel/UC8qU4aFe81jzG1attsyQ5wQ", key, cookie, "./videos", 100)
 
-  /*Download any video on the website. You can specify the quality and format, the default is the highest available.*/
+  /*Download any video on the website with yt-dlp.*/
   await youtube.util.downloadVideo("https://www.youtube.com/watch?v=mLJQ0HO5Alc", "./videos", {format: "mp4", quality: "720p60"})
 
-  /*Download just the MP3 track.*/
+  /*Download just the MP3 track with yt-dlp.*/
   await youtube.util.downloadMP3("https://www.youtube.com/watch?v=mLJQ0HO5Alc", "./videos/mp3")
 
   /*Mass download videos and/or mp3 files by passing in a YoutubeVideo[] array.*/

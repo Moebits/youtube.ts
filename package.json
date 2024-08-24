@@ -1,6 +1,6 @@
 {
   "name": "youtube.ts",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Wrapper for the YouTube API with typings.",
   "main": "dist/youtube.js",
   "module": "dist/youtube.js",
@@ -32,10 +32,10 @@
     "dotenv": "^8.2.0",
     "mocha": "^6.2.2",
     "ts-mocha": "^8.0.0",
-    "typescript": "^3.6.4"
+    "typescript": "^5.5.4"
   },
   "dependencies": {
     "axios": "^0.19.0",
-    "ytdl-core": "^4.11.0"
+    "play-dl": "^1.9.7"
   }
 }

@@ -81,5 +81,6 @@ export interface YoutubeVideoParams {
 
 export interface YoutubeDownloadOptions {
     quality?: "144p" | "240p" | "270p" | "360p" | "480p" | "720p" | "720p60" | "1080p" | "1080p60" | "1440p" | "1440p60" | "2160p" | "2160p60" | "4320p" | "4320p60"
-    format?: "mp4" | "flv" | "3gp" | "webm" | "ts"
+    format?: "mp4" | "flv" | "3gp" | "webm" | "ts" | "mp3" | "opus" | "wav" | "ogg" | "flac" | "aac" | "m4a"
+    ytDlpPath?: string
 }

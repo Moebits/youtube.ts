@@ -3,7 +3,8 @@ import fs from "fs"
 import path from "path"
 import querystring from "querystring"
 import stream from "stream"
-import ytdl from "ytdl-core"
+import play from "play-dl"
+import child_process from "child_process"
 import api from "../API"
 import {YoutubeDownloadOptions, YoutubeVideo, YoutubeVideoParams} from "../types"
 const downloadURL = "https://www.youtube.com/download_my_video"
@@ -127,39 +128,32 @@ export class Util {
         })
     }
 
-    public downloadVideo = async (videoResolvable: string,  dest?: string, ytdlOptions?: YoutubeDownloadOptions) => {
-        if (!ytdlOptions) ytdlOptions = {}
-        let options: any = {quality: "highest"}
-        if (ytdlOptions.format && !ytdlOptions.quality) {
-            options = {filter: (format) => format.container === ytdlOptions.format}
+    
+    public downloadVideo = async (videoResolvable: string,  dest?: string, downloadOptions?: YoutubeDownloadOptions) => {
+        let height = "1080"
+        let fps = "30"
+        let format = "mp4"
+        if (downloadOptions?.format) format = downloadOptions.format
+        if (downloadOptions?.quality) {
+            const [resolution, framerate] = downloadOptions.quality.split("p")
+            height = resolution || "1080"
+            fps = framerate || "30"
         }
-        if (ytdlOptions.quality) {
-            options = {filter: (format) => {
-                if (!ytdlOptions.format) ytdlOptions.format = "mp4"
-                const resolution = ytdlOptions.quality.split("p")[0] + "p"
-                const fps = ytdlOptions.quality.split("p")[1] || "30"
-                if ((format.container === ytdlOptions.format) &&
-                    (format.resolution === resolution) &&
-                    (format.fps === fps)) {
-                        return true
-                    } else {
-                        return false
-                    }
-                }
-            }
+        if (!path.isAbsolute(dest)) {
+            let local = __dirname.includes("node_modules") ? path.join(__dirname, "../../../") : path.join(__dirname, "..")
+            dest = path.join(local, dest)
         }
-        const id = await this.resolveID(videoResolvable, "video")
-        const url = `https://www.youtube.com/watch?v=${id}`
-        const info = await ytdl.getInfo(url)
-        const clean = info.videoDetails.title.replace(/\//g, " ").replace(/\\/g, " ")
-        if (!dest) dest = "./"
-        if (dest.endsWith("/")) dest = dest.slice(0, -1)
-        if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
-        const writeStream = fs.createWriteStream(`${dest}/${clean}.mp4`)
+        let command = downloadOptions?.ytDlpPath ? downloadOptions.ytDlpPath : "yt-dlp"
+        const child = child_process.exec(`${command} -f "ba+bv[height=${height}][fps=${fps}]" --merge-output-format ${format} -o "${dest}/%(title)s.%(ext)s" "${videoResolvable}"`)
+        let title = ""
         await new Promise<void>((resolve) => {
-            ytdl(url, options).pipe(writeStream).on("finish", () => resolve())
+            child.stdout.on("data", (chunk) => {
+                if (chunk.includes("Merging formats")) title = chunk.match(/(?<=")(.*?)(?=")/)?.[0]
+            })
+            child.on("close", () => resolve())
+            child.on("error", (err) => console.log(err))
         })
-        return `${dest}/${clean}.mp4`
+        return `${dest}/${title}`
     }
 
     public downloadVideos = async (videos: string[] | YoutubeVideo[], dest?: string, ytdlOptions?: YoutubeDownloadOptions) => {
@@ -195,19 +189,24 @@ export class Util {
         return links
     }
 
-    public downloadMP3 = async (videoResolvable: string, dest?: string) => {
-        const id = await this.resolveID(videoResolvable, "video")
-        const url = `https://www.youtube.com/watch?v=${id}`
-        const info = await ytdl.getInfo(url)
-        const clean = info.videoDetails.title.replace(/\//g, " ").replace(/\\/g, " ")
-        if (!dest) dest = "./"
-        if (dest.endsWith("/")) dest = dest.slice(0, -1)
-        if (!fs.existsSync(dest)) fs.mkdirSync(dest, {recursive: true})
-        const writeStream = fs.createWriteStream(`${dest}/${clean}.mp3`)
+    public downloadMP3 = async (videoResolvable: string, dest?: string, downloadOptions?: YoutubeDownloadOptions) => {
+        let format = "mp3"
+        if (downloadOptions) format = downloadOptions.format
+        if (!path.isAbsolute(dest)) {
+            let local = __dirname.includes("node_modules") ? path.join(__dirname, "../../../") : path.join(__dirname, "..")
+            dest = path.join(local, dest)
+        }
+        let command = downloadOptions?.ytDlpPath ? downloadOptions.ytDlpPath : "yt-dlp"
+        const child = child_process.exec(`${command} -x --audio-format ${format} -o "${dest}/%(title)s.%(ext)s" "${videoResolvable}"`)
+        let title = ""
         await new Promise<void>((resolve) => {
-            ytdl(url, {filter: "audioonly"}).pipe(writeStream).on("finish", () => resolve())
+            child.stdout.on("data", (chunk) => {
+                if (chunk.includes("Destination")) title = chunk.match(/(?<=Destination: ).*/)?.[0]
+            })
+            child.on("close", () => resolve())
+            child.on("error", (err) => console.log(err))
         })
-        return `${dest}/${clean}.mp3`
+        return `${dest}/${title}`
     }
 
     public downloadMP3s = async (videos: string[] | YoutubeVideo[], dest?: string) => {
@@ -246,7 +245,7 @@ export class Util {
     public streamMP3 = async (videoResolvable: string) => {
         const id = await this.resolveID(videoResolvable, "video")
         const url = `https://www.youtube.com/watch?v=${id}`
-        return ytdl(url, {filter: "audioonly"})
+        return play.stream(url)
     }
 
     /**
@@ -257,10 +256,10 @@ export class Util {
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
         const id = await this.resolveID(videoResolvable, "video")
         const url = `https://www.youtube.com/watch?v=${id}`
-        const info = await ytdl.getInfo(url)
-        const thumbnail = info.videoDetails.thumbnails[info.videoDetails.thumbnails.length - 1].url
+        const info = await play.video_basic_info(url).then((i) => i.video_details)
+        const thumbnail = info.thumbnails[info.thumbnails.length - 1].url
         if (noDL) return thumbnail
-        const dest = path.join(folder, `${info.videoDetails.title}.png`)
+        const dest = path.join(folder, `${info.title}.png`)
         const arrayBuffer = await axios.get(thumbnail, {responseType: "arraybuffer"}).then((r) => r.data)
         fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
         return dest
@@ -272,7 +271,7 @@ export class Util {
     public getTitle = async (videoResolvable: string) => {
         const id = await this.resolveID(videoResolvable, "video")
         const url = `https://www.youtube.com/watch?v=${id}`
-        const info = await ytdl.getInfo(url)
-        return info.videoDetails.title
+        const info = await play.video_basic_info(url).then((i) => i.video_details)
+        return info.title
     }
 }

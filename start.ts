@@ -4,6 +4,6 @@ require("dotenv").config()
 const youtube = new Youtube();
 
 (async () => {
-    const c = await youtube.util.downloadThumbnail("https://www.youtube.com/watch?v=OJf04b6884E", "./videos")
+    const c = await youtube.util.downloadMP3("https://www.youtube.com/watch?v=wzKiyCboShU", "../videos")
     console.log(c)
 })()
