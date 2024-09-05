@@ -1,6 +1,6 @@
 {
   "name": "youtube.ts",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Wrapper for the YouTube API with typings.",
   "main": "dist/youtube.js",
   "module": "dist/youtube.js",
@@ -35,7 +35,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
-    "axios": "^0.19.0",
-    "play-dl": "^1.9.7"
+    "@iamtraction/play-dl": "^1.9.8",
+    "axios": "^0.19.0"
   }
 }

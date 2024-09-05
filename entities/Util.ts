@@ -3,10 +3,10 @@ import fs from "fs"
 import path from "path"
 import querystring from "querystring"
 import stream from "stream"
-import play from "play-dl"
+import playStream from "@iamtraction/play-dl"
 import child_process from "child_process"
 import api from "../API"
-import {YoutubeDownloadOptions, YoutubeVideo, YoutubeVideoParams} from "../types"
+import {YoutubeDownloadOptions, YoutubeVideo} from "../types"
 const downloadURL = "https://www.youtube.com/download_my_video"
 
 export class Util {
@@ -189,24 +189,20 @@ export class Util {
         return links
     }
 
-    public downloadMP3 = async (videoResolvable: string, dest?: string, downloadOptions?: YoutubeDownloadOptions) => {
+    public downloadMP3 = async (url: string, dest?: string, downloadOptions?: YoutubeDownloadOptions) => {
         let format = "mp3"
         if (downloadOptions) format = downloadOptions.format
         if (!path.isAbsolute(dest)) {
             let local = __dirname.includes("node_modules") ? path.join(__dirname, "../../../") : path.join(__dirname, "..")
             dest = path.join(local, dest)
         }
-        let command = downloadOptions?.ytDlpPath ? downloadOptions.ytDlpPath : "yt-dlp"
-        const child = child_process.exec(`${command} -x --audio-format ${format} -o "${dest}/%(title)s.%(ext)s" "${videoResolvable}"`)
-        let title = ""
-        await new Promise<void>((resolve) => {
-            child.stdout.on("data", (chunk) => {
-                if (chunk.includes("Destination")) title = chunk.match(/(?<=Destination: ).*/)?.[0]
-            })
-            child.on("close", () => resolve())
-            child.on("error", (err) => console.log(err))
+        const title = await this.getTitle(url)
+        const stream = await playStream.stream(url)
+        const output = `${dest}/${title}.${format}`
+        return new Promise<string>((resolve) => {
+            stream.stream.pipe(fs.createWriteStream(output))
+            .on("finish", () => resolve(output))
         })
-        return `${dest}/${title}`
     }
 
     public downloadMP3s = async (videos: string[] | YoutubeVideo[], dest?: string) => {
@@ -245,7 +241,8 @@ export class Util {
     public streamMP3 = async (videoResolvable: string) => {
         const id = await this.resolveID(videoResolvable, "video")
         const url = `https://www.youtube.com/watch?v=${id}`
-        return play.stream(url)
+        const stream = await playStream.stream(url)
+        return stream.stream as NodeJS.ReadableStream
     }
 
     /**
@@ -256,10 +253,10 @@ export class Util {
         if (!fs.existsSync(folder)) fs.mkdirSync(folder, {recursive: true})
         const id = await this.resolveID(videoResolvable, "video")
         const url = `https://www.youtube.com/watch?v=${id}`
-        const info = await play.video_basic_info(url).then((i) => i.video_details)
-        const thumbnail = info.thumbnails[info.thumbnails.length - 1].url
+        const thumbnail = await this.getThumbnailSrc(url)
+        const title = await this.getTitle(url)
         if (noDL) return thumbnail
-        const dest = path.join(folder, `${info.title}.png`)
+        const dest = path.join(folder, `${title}.png`)
         const arrayBuffer = await axios.get(thumbnail, {responseType: "arraybuffer"}).then((r) => r.data)
         fs.writeFileSync(dest, Buffer.from(arrayBuffer, "binary"))
         return dest
@@ -271,7 +268,17 @@ export class Util {
     public getTitle = async (videoResolvable: string) => {
         const id = await this.resolveID(videoResolvable, "video")
         const url = `https://www.youtube.com/watch?v=${id}`
-        const info = await play.video_basic_info(url).then((i) => i.video_details)
-        return info.title
+        const html = await axios.get(url, {headers: {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"}}).then((r) => r.data)
+        return html.match(/(?<=meta name="title" content=")(.*?)(?=")/)?.[0] || ""
+    }
+
+    /**
+     * Gets a video's thumbnail link from the url.
+     */
+    public getThumbnailSrc = async (videoResolvable: string) => {
+        const id = await this.resolveID(videoResolvable, "video")
+        const url = `https://www.youtube.com/watch?v=${id}`
+        const html = await axios.get(url, {headers: {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36"}}).then((r) => r.data)
+        return html.match(/(?<=meta property="og:image" content=")(.*?)(?=")/)?.[0] || ""
     }
 }
