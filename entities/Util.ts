@@ -198,7 +198,7 @@ export class Util {
         }
         const title = await this.getTitle(url)
         const stream = await playStream.stream(url)
-        const output = `${dest}/${title}.${format}`
+        const output = path.extname(dest) ? dest : path.join(dest, `${title}.${format}`)
         return new Promise<string>((resolve) => {
             stream.stream.pipe(fs.createWriteStream(output))
             .on("finish", () => resolve(output))
